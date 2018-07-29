@@ -1,0 +1,20 @@
+{
+  "name": "rrun",
+  "version": "0.0.0",
+  "description": "Reason/OCaml runtime",
+  "author": "Andrey Popp <me@andreypopp.com",
+  "license": "MIT",
+  "esy": {
+    "build": "dune build"
+  },
+  "dependencies": {
+    "ocaml": "~4.6.0",
+    "@opam/cmdliner": "*",
+    "@opam/lwt": "*",
+    "@opam/dune": "*",
+    "@opam/ppx_let": "*"
+  },
+  "devDependencies": {
+    "@opam/merlin": "*"
+  }
+}
