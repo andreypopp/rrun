@@ -1,0 +1,5 @@
+(executable
+  (name main)
+  (public_name rrun)
+  (preprocess (pps lwt_ppx))
+  (libraries rrun lwt lwt.unix cmdliner fpath))

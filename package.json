@@ -11,10 +11,14 @@
     "ocaml": "~4.6.0",
     "@opam/cmdliner": "*",
     "@opam/lwt": "*",
+    "@opam/lwt_ppx": "*",
     "@opam/dune": "*",
-    "@opam/ppx_let": "*"
+    "@opam/ppx_let": "*",
+    "@opam/fpath": "*",
+    "@opam/ppxlib": "*"
   },
   "devDependencies": {
-    "@opam/merlin": "*"
+    "@opam/merlin": "*",
+    "@opam/ocamlformat": "*"
   }
 }

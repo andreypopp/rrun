@@ -1,4 +1,0 @@
-(executable
-  (name rrun)
-  (public_name rrun)
-  (libraries lwt))

@@ -1,0 +1,7 @@
+(executable
+  (name rrundep)
+  (public_name rrundep)
+  (package rrun)
+  (modules rrundep)
+  (preprocess (pps ppxlib.metaquot))
+  (libraries rrun ppxlib fpath))
