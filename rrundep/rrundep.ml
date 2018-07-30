@@ -8,16 +8,18 @@ module Deps = struct
   end
 
   module V = struct
-    type t = (string * string) list
+    type t = (string * string * string) list
 
     module S = Sexplib0.Sexp
 
     let sexp_of_t items =
-      let f (id, spec) = S.List [S.Atom id; S.Atom spec] in
+      let f (id, spec, filename) =
+        S.List [S.Atom id; S.Atom spec; S.Atom filename]
+      in
       let items = List.map f items in
       S.List items
 
-    let t_of_sexp _ = [("s", "some")]
+    let t_of_sexp _ = []
   end
 
   module NV = Driver.Create_file_property (N) (V)
@@ -29,12 +31,16 @@ let dependencies = ref []
 let expand ~loc ~path:_ (spec: string) =
   let ident =
     let filename =
-      let basePath = Fpath.(parent (v loc.loc_start.pos_fname)) in
-      Rrun.BuildSystem.resolve spec basePath
+      let fname =
+        try Sys.getenv "RRUN_FILENAME" with Not_found ->
+          failwith "RRUN_FILENAME is not set"
+      in
+      let basePath = Fpath.(parent (v fname)) in
+      Fpath.to_string (Rrun.BuildSystem.resolve spec basePath)
     in
     let id = Rrun.BuildSystem.makeId filename in
     let ident = id |> Longident.parse |> Loc.make ~loc in
-    dependencies := (id, filename) :: !dependencies ;
+    dependencies := (id, spec, filename) :: !dependencies ;
     Deps.set !dependencies ;
     ident
   in

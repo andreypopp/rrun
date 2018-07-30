@@ -14,8 +14,12 @@
     "@opam/lwt_ppx": "*",
     "@opam/dune": "*",
     "@opam/ppx_let": "*",
+    "@opam/sexplib": "*",
+    "@opam/ppx_sexp_conv": "*",
+    "@opam/ppx_compare": "*",
     "@opam/fpath": "*",
-    "@opam/ppxlib": "*"
+    "@opam/ppxlib": "*",
+    "@opam/fmt": "*"
   },
   "devDependencies": {
     "@opam/merlin": "*",

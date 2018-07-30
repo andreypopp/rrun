@@ -1,5 +1,5 @@
 (library
   (name rrun)
   (public_name rrun)
-  (preprocess (pps lwt_ppx))
-  (libraries lwt lwt.unix cmdliner fpath))
+  (preprocess (pps lwt_ppx ppx_sexp_conv ppx_compare))
+  (libraries lwt lwt.unix cmdliner fpath fmt sexplib))

@@ -2,3 +2,4 @@ node_modules/
 *.install
 .merlin
 _build
+test
