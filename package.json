@@ -5,7 +5,45 @@
   "author": "Andrey Popp <me@andreypopp.com",
   "license": "MIT",
   "esy": {
-    "build": "dune build"
+    "build": "dune build",
+    "release": {
+      "releasedBinaries": [
+        "rrun"
+      ],
+      "deleteFromBinaryRelease": [
+        "opam__slash__fmt-*",
+        "opam__slash__cmdliner-*",
+        "opam__slash__uchar-*",
+        "opam__slash__fpath-*",
+        "opam__slash__astring-*",
+        "opam__slash__topkg-*",
+        "opam__slash__ocamlbuild-*",
+        "opam__slash__lwt__ppx-*",
+        "opam__slash__lwt-*",
+        "opam__slash__cppo-*",
+        "opam__slash__base_bytes-*",
+        "opam__slash__base_unix-*",
+        "opam__slash__ppx__tools__versioned-*",
+        "opam__slash__ppx__compare-*",
+        "opam__slash__ppx__let-*",
+        "opam__slash__ppx__sexp__conv-*",
+        "opam__slash__ppxlib-*",
+        "opam__slash__ocaml_compiler_libs-*",
+        "opam__slash__ocaml_migrate_parsetree-*",
+        "opam__slash__result-1.3-*",
+        "opam__slash__ppx__derivers-*",
+        "opam__slash__stdio-*",
+        "opam__slash__base-*",
+        "opam__slash__sexplib-*",
+        "opam__slash__num-*",
+        "opam__slash__parsexp-*",
+        "opam__slash__sexplib0-*",
+        "opam__slash__jbuilder-*",
+        "opam__slash__dune-1.0.1-*",
+        "opam__slash__conf_m4-1-*",
+        "esy_ocaml__slash__substs-*"
+      ]
+    }
   },
   "dependencies": {
     "ocaml": "~4.6.0",
