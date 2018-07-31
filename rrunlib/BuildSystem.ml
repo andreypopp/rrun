@@ -161,8 +161,8 @@ end = struct
             Cmd.(v "rrundep" % "-as-ppx" % "-loc-filename" % p m.path)
           in
           let open Cmd in
-          v "ocamlopt" % "-verbose" % "-bin-annot" % "-c" % "-I" % p storePath
-          % "-ppx" % Cmd.to_string ppx % p m.srcPath
+          v "ocamlopt" % "-short-paths" % "-keep-locs" % "-bin-annot" % "-c"
+          % "-I" % p storePath % "-ppx" % Cmd.to_string ppx % p m.srcPath
         in
         Process.run ~env:[|"RRUN_FILENAME=" ^ Fpath.to_string m.path|] cmd ;%lwt
         Lwt.return true
@@ -175,7 +175,10 @@ end = struct
       let work () =
         prerr_endline ("[b exe] " ^ Fpath.to_string m.path) ;
         let cmd =
-          let cmd = Cmd.(v "ocamlopt" % "-verbose" % "-o" % p exePath) in
+          let cmd =
+            let open Cmd in
+            v "ocamlopt" % "-short-paths" % "-keep-locs" % "-o" % p exePath
+          in
           let f cmd obj = Cmd.(cmd % p obj) in
           List.fold_left f cmd objs
         in

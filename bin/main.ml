@@ -15,16 +15,24 @@ module Api = struct
     let exePath = Lwt_main.run comp in
     Unix.execv (Fpath.to_string exePath) Sys.argv
 
-  let generate_merlin () =
-    Format.printf
-      {|
+  let merlin =
+    {|
 B /Users/andreypopp/.rrun
 S /Users/andreypopp/.rrun
 S .
-FLG -ppx '/Users/andreypopp/Workspace/rrun/_build/default/rrundep/rrundep.exe --as-ppx'
+FLG -ppx 'rrundep --as-ppx'
 FLG -w @a-4-29-40-41-42-44-45-48-58-59-60-40 -strict-sequence -strict-formats -short-paths -keep-locs
-|} ;
-    `Ok ()
+|}
+
+  let generate_merlin () = print_endline merlin ; `Ok ()
+
+  let edit path =
+    let editor = try Sys.getenv "EDITOR" with Not_found -> "vi" in
+    let parent = Fpath.(parent path / ".merlin") in
+    let oc = open_out (Fpath.to_string parent) in
+    output_string oc merlin ;
+    close_out oc ;
+    Unix.execv editor [|editor; Fpath.to_string path|]
 end
 
 open Cmdliner
@@ -66,7 +74,14 @@ let merlin_cmd =
   let info = Term.info "gen-merlin" ~doc ~sdocs ~exits in
   (Term.(ret (const Api.generate_merlin $ const ())), info)
 
-let cmds = [run_cmd; build_cmd; merlin_cmd]
+let edit_cmd =
+  let doc = "Edit program." in
+  let sdocs = Manpage.s_common_options in
+  let exits = Term.default_exits in
+  let info = Term.info "edit" ~doc ~sdocs ~exits in
+  (Term.(ret (const Api.edit $ program_arg)), info)
+
+let cmds = [run_cmd; build_cmd; merlin_cmd; edit_cmd]
 
 let () =
   Printexc.record_backtrace true ;
@@ -74,7 +89,7 @@ let () =
   let argv =
     match Sys.argv.(1) with
     | exception Invalid_argument _ -> Sys.argv
-    | "" | "build" | "run" | "gen-merlin" | "--" -> Sys.argv
+    | "" | "build" | "run" | "gen-merlin" | "edit" | "--" -> Sys.argv
     | w ->
         if w.[0] = '-' then Sys.argv
         else

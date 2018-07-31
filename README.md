@@ -11,54 +11,29 @@ Install rrun via npm:
 % npm install -g rrun
 ```
 
-## Usage (not implemented yet)
+## Usage
 
-Given a file with valid Reason syntax one can execute it with:
+Run Reason or OCaml programs with:
 
 ```shell
 % rrun ./app.re
-```
-
-or with OCaml syntax:
-
-```shell
 % rrun ./app.ml
 ```
 
-Another option is to add shebang line which mentiones `rrun`:
+You can specify dependencies between modules via `[%import "..."]` syntax:
 
-```reason
-#!/usr/bin/env rrun
-
-print_endline("Hello, World!");
+```
+module Url = [%import "./Url.re"]
 ```
 
-or with OCaml syntax:
+### IDE support
 
-```ocaml
-#!/usr/bin/env rrun
+There's `rrun edit` command which will run your configured editor (via
+`$EDITOR`) in a properly configured environment:
 
-let () =
-  print_endline "Hello, World!"
 ```
-
-## Features
-
-### Dependency Management
-
-rrun has its own dependency management mechanism inspired by [deno][].
-
-The special syntax `[%import SPEC]` is used to reference other modules, where
-`SPEC` can be either a relative path or an URL pointing to an `https:` resource.
-Examples:
-
-- ```reason
-  module Url = [%import "./Url.re"]
-  ```
-
-- ```reason
-  module Url = [%import "https://example.com/url@0.1.2/Url.re"]
-  ```
+% rrun edit ./app.re
+```
 
 ### Sandboxed Execution
 
@@ -87,7 +62,6 @@ TODO
 - [ ] Support `[%import "https://secure/url.ml"]` dependencies
 - [ ] Support interfaces
 - [ ] Sandboxed execution
-- [ ] Allow using `rrun` in shebang line: `#!/usr/bin/env rrun`
 
 - [x] Build OCaml code
 - [x] Support `[%import "./relative/path.ml"]` dependencies

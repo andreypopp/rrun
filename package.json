@@ -41,7 +41,11 @@
         "opam__slash__jbuilder-*",
         "opam__slash__dune-1.0.1-*",
         "opam__slash__conf_m4-1-*",
-        "esy_ocaml__slash__substs-*"
+        "esy_ocaml__slash__substs-*",
+        "opam__slash__conf_which-*",
+        "opam__slash__easy_format-*",
+        "opam__slash__biniou-*",
+        "opam__slash__yojson-*"
       ]
     }
   },
@@ -57,10 +61,10 @@
     "@opam/ppx_compare": "*",
     "@opam/fpath": "*",
     "@opam/ppxlib": "*",
-    "@opam/fmt": "*"
+    "@opam/fmt": "*",
+    "@opam/merlin": "*"
   },
   "devDependencies": {
-    "@opam/merlin": "*",
     "@opam/ocamlformat": "*"
   }
 }
