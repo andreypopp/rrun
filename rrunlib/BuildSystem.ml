@@ -33,7 +33,7 @@ end = struct
       | _ -> raise (Invalid_argument "invalid dependency format")
 end
 
-let makeId spec =
+let make_id spec =
   let len = String.length spec in
   let rec aux acc idx =
     if idx = len then acc |> List.rev |> String.concat ""
@@ -86,6 +86,7 @@ end
 module Module : sig
   type t =
     { id: string
+    ; kind: kind
     ; path: Fpath.t
     ; objPath: Fpath.t
     ; exePath: Fpath.t
@@ -95,12 +96,15 @@ module Module : sig
 
   and state = New | Stale | Ready
 
-  val ofPath : Fpath.t -> t Lwt.t
+  and kind = OCaml | Reason
+
+  val of_path : Fpath.t -> t Lwt.t
 
   val build : t -> t Lwt.t
 end = struct
   type t =
     { id: string
+    ; kind: kind
     ; path: Fpath.t
     ; objPath: Fpath.t
     ; exePath: Fpath.t
@@ -109,6 +113,8 @@ end = struct
     ; state: state }
 
   and state = New | Stale | Ready
+
+  and kind = OCaml | Reason
 
   let checkState ~out_path in_path =
     match%lwt Fs.stat out_path with
@@ -117,14 +123,20 @@ end = struct
         let%lwt {Unix.st_mtime= in_mtime; _} = Fs.stat in_path in
         if out_mtime < in_mtime then Lwt.return Stale else Lwt.return Ready
 
-  let ofPath path =
-    let id = makeId (Fpath.to_string path) in
+  let of_path path =
+    let id = make_id (Fpath.to_string path) in
     let srcPath = Fpath.(storePath / id |> add_ext ".ml") in
     let depPath = Fpath.(storePath / id |> add_ext ".dep") in
     let exePath = Fpath.(storePath / id |> add_ext ".exe") in
     let objPath = Fpath.(storePath / id |> add_ext ".cmx") in
     let%lwt state = checkState ~out_path:srcPath path in
-    Lwt.return {id; path; objPath; exePath; srcPath; depPath; state}
+    let kind =
+      match Fpath.get_ext path with
+      | "re" | ".re" -> Reason
+      | "ml" | ".ml" -> OCaml
+      | _ -> failwith ("unknown module kind: " ^ Fpath.to_string path)
+    in
+    Lwt.return {id; kind; path; objPath; exePath; srcPath; depPath; state}
 
   let promote m =
     match m.state with
@@ -137,17 +149,35 @@ end = struct
         Lwt.return {m with state= Stale}
     | Ready -> Lwt.return m
 
-  let extractDependencies (m: t) =
+  let extract_dependencies (m: t) =
     match m.state with
     | Ready -> Deps.of_file m.depPath
     | Stale | New ->
         let%lwt m = promote m in
+        let%lwt cmd =
+          match m.kind with
+          | OCaml ->
+              Lwt.return
+                Cmd.(
+                  v "rrundep" % "-loc-filename" % p m.path % "-output-metadata"
+                  % p m.depPath % "-impl" % p m.srcPath)
+          | Reason ->
+              let ppPath = Fpath.(storePath / (m.id ^ "__ml.ml")) in
+              let%lwt () = Fs.copy_file ~src_path:m.srcPath ppPath in
+              let%lwt () =
+                let cmd =
+                  let open Cmd in
+                  v "refmt" % "--parse" % "re" % "--print" % "binary"
+                  % "--in-place" % p ppPath
+                in
+                Process.run cmd
+              in
+              Lwt.return
+                Cmd.(
+                  v "rrundep" % "-loc-filename" % p m.path % "-output-metadata"
+                  % p m.depPath % "-impl" % p ppPath)
+        in
         let%lwt () =
-          let cmd =
-            let open Cmd in
-            v "rrundep" % "-loc-filename" % p m.path % "-output-metadata"
-            % p m.depPath % "-impl" % p m.srcPath
-          in
           Process.run ~env:[|"RRUN_FILENAME=" ^ Fpath.to_string m.path|] cmd
         in
         Deps.of_file m.depPath
@@ -157,12 +187,24 @@ end = struct
       let work () =
         prerr_endline ("[b obj] " ^ Fpath.to_string m.path) ;
         let cmd =
-          let ppx =
-            Cmd.(v "rrundep" % "-as-ppx" % "-loc-filename" % p m.path)
+          let ppx = Cmd.(v "rrundep" % "-as-ppx") in
+          let pp_refmt =
+            Cmd.(v "refmt" % "--parse" % "re" % "--print" % "binary")
           in
-          let open Cmd in
-          v "ocamlopt" % "-short-paths" % "-keep-locs" % "-bin-annot" % "-c"
-          % "-I" % p storePath % "-ppx" % Cmd.to_string ppx % p m.srcPath
+          let default_args =
+            ["-verbose"; "-short-paths"; "-keep-locs"; "-bin-annot"]
+          in
+          let cmd =
+            let cmd = Cmd.(v "ocamlopt" |> add_args default_args) in
+            let cmd = Cmd.(cmd % "-c" % "-I" % p storePath) in
+            let cmd =
+              match m.kind with
+              | Reason -> Cmd.(cmd % "-pp" % Cmd.to_string pp_refmt)
+              | OCaml -> cmd
+            in
+            Cmd.(cmd % "-ppx" % Cmd.to_string ppx % p m.srcPath)
+          in
+          cmd
         in
         Process.run ~env:[|"RRUN_FILENAME=" ^ Fpath.to_string m.path|] cmd ;%lwt
         Lwt.return true
@@ -190,10 +232,10 @@ end = struct
     in
     let rec batchBuildObj (needRebuild, seen, objs) m =
       (* prerr_endline ("[->] " ^ Fpath.to_string m.path) ; *)
-      let%lwt deps = extractDependencies m in
+      let%lwt deps = extract_dependencies m in
       let%lwt needRebuild, seen, objs =
         let buildDep (n, seen, objs) (dep: Deps.dep) =
-          let%lwt m = ofPath dep.path in
+          let%lwt m = of_path dep.path in
           let%lwt nn, seen, objs = batchBuildObj (needRebuild, seen, objs) m in
           Lwt.return (n || nn, seen, objs)
         in
@@ -221,10 +263,10 @@ end = struct
     buildExe ~force:needRebuild m.exePath (List.rev objs) ;%lwt Lwt.return m
 end
 
-let resolve spec basePath = Fpath.(basePath // v spec |> normalize)
+let resolve spec base_path = Fpath.(base_path // v spec |> normalize)
 
 let build root =
   let root = resolve (Fpath.to_string root) currentPath in
-  let%lwt root = Module.ofPath root in
+  let%lwt root = Module.of_path root in
   let%lwt built = Module.build root in
   Lwt.return built.exePath

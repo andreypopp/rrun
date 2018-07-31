@@ -45,7 +45,10 @@
         "opam__slash__conf_which-*",
         "opam__slash__easy_format-*",
         "opam__slash__biniou-*",
-        "opam__slash__yojson-*"
+        "opam__slash__yojson-*",
+        "opam__slash__merlin_extend-*",
+        "esy_ocaml__slash__esy_installer-*",
+        "opam__slash__menhir-*"
       ]
     }
   },
@@ -62,7 +65,8 @@
     "@opam/fpath": "*",
     "@opam/ppxlib": "*",
     "@opam/fmt": "*",
-    "@opam/merlin": "*"
+    "@opam/merlin": "*",
+    "@esy-ocaml/reason": "*"
   },
   "devDependencies": {
     "@opam/ocamlformat": "*"

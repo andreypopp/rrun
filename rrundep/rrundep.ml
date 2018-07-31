@@ -39,7 +39,7 @@ let expand ~loc ~path:_ (spec: string) =
       let basePath = Fpath.(parent fname) in
       Fpath.to_string (Rrun.BuildSystem.resolve spec basePath)
     in
-    let id = Rrun.BuildSystem.makeId filename in
+    let id = Rrun.BuildSystem.make_id filename in
     let ident = id |> Longident.parse |> Loc.make ~loc in
     dependencies := (id, spec, filename) :: !dependencies ;
     Deps.set !dependencies ;

@@ -24,6 +24,10 @@ You can specify dependencies between modules via `[%import "..."]` syntax:
 
 ```
 module Url = [%import "./Url.re"]
+module Chalk = [%import "https://example.com/Chalk.re"]
+
+let url = Url.make("http://example.com");
+print_endline(Url.show(url));
 ```
 
 ### IDE support
