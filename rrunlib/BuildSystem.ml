@@ -221,7 +221,7 @@ end
 let resolve spec basePath = Fpath.(basePath // v spec |> normalize)
 
 let build root =
-  let root = resolve root currentPath in
+  let root = resolve (Fpath.to_string root) currentPath in
   let%lwt root = Module.ofPath root in
   let%lwt built = Module.build root in
   Lwt.return built.exePath
