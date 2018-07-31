@@ -2,6 +2,8 @@
 
 **WIP: DO NOT USE**
 
+[![Build Status](https://travis-ci.com/andreypopp/rrun.svg?branch=master)](https://travis-ci.com/andreypopp/rrun)
+
 rrun allows to seamlessly run [Reason][]/[OCaml][] code with native speed.
 
 ## Installation (not implemented yet)
