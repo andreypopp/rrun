@@ -67,3 +67,27 @@ TODO
 ## Internals
 
 TODO
+
+## Development
+
+### Workflow
+
+```
+% npm install -g esy
+% git clone https://github.com/andreypopp/rrun.git
+% cd rrun
+% esy install
+% esy build
+% esy "$EDITOR"
+```
+
+### TODO
+
+- [ ] Build Reason code
+- [ ] Support `[%import "https://secure/url.ml"]` dependencies
+- [ ] Support interfaces
+- [ ] Sandboxed execution
+- [ ] Allow using `rrun` in shebang line: `#!/usr/bin/env rrun`
+
+- [x] Build OCaml code
+- [x] Support `[%import "./relative/path.ml"]` dependencies
