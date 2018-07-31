@@ -62,10 +62,10 @@ TODO
 
 ### TODO
 
-- [ ] Support `[%import "https://secure/url.ml"]` dependencies
-- [ ] Support interfaces
 - [ ] Sandboxed execution
+- [ ] Support interfaces
 
 - [x] Build Reason code
 - [x] Build OCaml code
 - [x] Support `[%import "./relative/path.ml"]` dependencies
+- [x] Support `[%import "https://secure/url.ml"]` dependencies
