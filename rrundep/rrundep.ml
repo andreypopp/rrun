@@ -49,8 +49,20 @@ let expand ~loc ~path:_ (spec: string) =
 
 let () =
   let ext =
+    let pat1 = Ast_pattern.(estring __) in
+    let pat2 =
+      let open Ast_pattern in
+      let f _ v = v in
+      map2 ~f
+        (pexp_attributes
+           (many
+              (attribute
+                 (string "reason.raw_literal")
+                 (single_expr_payload (estring __))))
+           (estring __))
+    in
     Extension.declare name Extension.Context.module_expr
-      Ast_pattern.(single_expr_payload (estring __))
+      Ast_pattern.(single_expr_payload (pat1 ||| pat2))
       expand
   in
   Driver.register_transformation name ~extensions:[ext]
