@@ -1,5 +1,5 @@
 {
-  "hash": "9db33ef4ef6ed314e017bfe5fde901d3",
+  "hash": "1292edc764753d3a28c8aa1183775957",
   "root": "rrun@path:.",
   "node": {
     "rrun@path:.": {
@@ -18,7 +18,7 @@
         "@opam/ocamlformat@opam:0.6", "@opam/ppx_compare@opam:v0.11.1",
         "@opam/ppx_let@opam:v0.11.0", "@opam/ppx_sexp_conv@opam:v0.11.2",
         "@opam/ppxlib@opam:0.3.0", "@opam/sexplib@opam:v0.11.0",
-        "ocaml@4.6.4"
+        "@opam/uri@opam:1.9.7", "ocaml@4.6.4"
       ]
     },
     "ocaml@4.6.4": {
@@ -53,6 +53,29 @@
         "@esy-ocaml/substs@0.0.1", "@opam/biniou@opam:1.2.0",
         "@opam/cppo@opam:1.6.4", "@opam/easy-format@opam:1.3.1",
         "@opam/jbuilder@opam:transition"
+      ]
+    },
+    "@opam/uri@opam:1.9.7": {
+      "record": {
+        "name": "@opam/uri",
+        "version": "opam:1.9.7",
+        "source": [
+          "archive:https://opam.ocaml.org/archives/uri.1.9.7+opam.tar.gz#md5:b05936ab09a23ccd111efaf8cce4950f",
+          "archive:https://github.com/mirage/ocaml-uri/releases/download/v1.9.7/uri-1.9.7.tbz#md5:2fb8da55f99a529bcb211a1d99822419"
+        ],
+        "files": [],
+        "opam": {
+          "name": "uri",
+          "version": "1.9.7",
+          "opam":
+            "opam-version: \"1.2\"\nmaintainer: \"sheets@alum.mit.edu\"\nauthors: [\"Anil Madhavapeddy\" \"David Sheets\" \"Rudi Grinberg\"]\nlicense: \"ISC\"\ntags: [\"url\" \"uri\" \"org:mirage\" \"org:xapi-project\"]\nhomepage: \"https://github.com/mirage/ocaml-uri\"\nbug-reports: \"https://github.com/mirage/ocaml-uri/issues\"\ndepends: [\n  \"jbuilder\" {build & >= \"1.0+beta7\"}\n  \"ounit\" {test & >= \"1.0.2\"}\n  \"ppx_sexp_conv\" {>= \"v0.9.0\"}\n  \"re\" {>= \"1.7.2\"}\n  \"sexplib\" {>= \"v0.9.0\"}\n  \"stringext\" {>= \"1.4.0\"}\n]\navailable: ocaml-version >= \"4.03.0\"\nbuild: [\n  [\"jbuilder\" \"subst\" \"-p\" name] {pinned}\n  [\"jbuilder\" \"build\" \"-p\" name \"-j\" jobs]\n]\nrun-test: [\"jbuilder\" \"runtest\" \"-p\" name \"-j\" jobs]\ndev-repo: \"git+https://github.com/mirage/ocaml-uri.git\"",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/jbuilder@opam:transition",
+        "@opam/ppx_sexp_conv@opam:v0.11.2", "@opam/re@opam:1.7.3",
+        "@opam/sexplib@opam:v0.11.0", "@opam/stringext@opam:1.5.0"
       ]
     },
     "@opam/uchar@opam:0.0.2": {
@@ -96,6 +119,28 @@
       "dependencies": [
         "@esy-ocaml/substs@0.0.1", "@opam/ocamlbuild@opam:0.12.0",
         "@opam/ocamlfind@opam:1.8.0", "@opam/result@opam:1.3"
+      ]
+    },
+    "@opam/stringext@opam:1.5.0": {
+      "record": {
+        "name": "@opam/stringext",
+        "version": "opam:1.5.0",
+        "source": [
+          "archive:https://opam.ocaml.org/archives/stringext.1.5.0+opam.tar.gz#md5:2d0810a928ebd057a122776cced58208",
+          "archive:https://github.com/rgrinberg/stringext/archive/1.5.0.zip#md5:867263ea97532f150516677fa994cdf2"
+        ],
+        "files": [],
+        "opam": {
+          "name": "stringext",
+          "version": "1.5.0",
+          "opam":
+            "opam-version: \"1.2\"\nmaintainer: \"rudi.grinberg@gmail.com\"\nauthors: \"Rudi Grinberg\"\nlicense: \"MIT\"\nhomepage: \"https://github.com/rgrinberg/stringext\"\nbug-reports: \"https://github.com/rgrinberg/stringext/issues\"\ndepends: [\n  \"jbuilder\" {build & >= \"1.0+beta10\"}\n  \"ounit\" {test}\n  \"qtest\" {test & >= \"2.2\"}\n  \"base-bytes\"\n]\navailable: ocaml-version >= \"4.02.3\"\nbuild: [\n  [\"jbuilder\" \"subst\" \"-p\" name] {pinned}\n  [\"jbuilder\" \"build\" \"-p\" name \"-j\" jobs]\n]\nrun-test: [\"jbuilder\" \"runtest\" \"-p\" name \"-j\" jobs]\ndev-repo: \"git+https://github.com/rgrinberg/stringext.git\"",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/base-bytes@opam:base",
+        "@opam/jbuilder@opam:transition"
       ]
     },
     "@opam/stdio@opam:v0.11.0": {
@@ -178,6 +223,27 @@
           "version": "1.3",
           "opam":
             "opam-version: \"1.2\"\nmaintainer: \"opensource@janestreet.com\"\nauthors: \"Jane Street Group, LLC <opensource@janestreet.com>\"\nlicense: \"BSD3\"\nhomepage: \"https://github.com/janestreet/result\"\nbug-reports: \"https://github.com/janestreet/result/issues\"\ndepends: [\n  \"jbuilder\" {build & >= \"1.0+beta11\"}\n]\nbuild: [\"jbuilder\" \"build\" \"-p\" name \"-j\" jobs]\ndev-repo: \"git+https://github.com/janestreet/result.git\"",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/jbuilder@opam:transition"
+      ]
+    },
+    "@opam/re@opam:1.7.3": {
+      "record": {
+        "name": "@opam/re",
+        "version": "opam:1.7.3",
+        "source": [
+          "archive:https://opam.ocaml.org/archives/re.1.7.3+opam.tar.gz#md5:065e5d37c2892bf184505f416e072bec",
+          "archive:https://github.com/ocaml/ocaml-re/releases/download/1.7.3/re-1.7.3.tbz#md5:d2a74ca77216861bce4449600a132de9"
+        ],
+        "files": [],
+        "opam": {
+          "name": "re",
+          "version": "1.7.3",
+          "opam":
+            "opam-version: \"1.2\"\nmaintainer: \"rudi.grinberg@gmail.com\"\nauthors: [\n  \"Jerome Vouillon\"\n  \"Thomas Gazagnaire\"\n  \"Anil Madhavapeddy\"\n  \"Rudi Grinberg\"\n  \"Gabriel Radanne\"\n]\nlicense: \"LGPL-2.0 with OCaml linking exception\"\nhomepage: \"https://github.com/ocaml/ocaml-re\"\nbug-reports: \"https://github.com/ocaml/ocaml-re/issues\"\ndepends: [\n  \"jbuilder\" {build & >= \"1.0+beta10\"}\n  \"ounit\" {test}\n]\navailable: ocaml-version >= \"4.02.3\"\nbuild: [\n  [\"jbuilder\" \"subst\" \"-p\" name] {pinned}\n  [\"jbuilder\" \"build\" \"-p\" name \"-j\" jobs]\n]\nrun-test: [\"jbuilder\" \"runtest\" \"-p\" name \"-j\" jobs]\ndev-repo: \"git+https://github.com/ocaml/ocaml-re.git\"",
           "override": null
         }
       },

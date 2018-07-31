@@ -1,8 +1,6 @@
-open Sexplib.Conv
-
 type t =
   | Path of Path.t
-  | Https of string
+  | Https of Uri.t
   [@@deriving sexp]
 
 let safe_string spec =
@@ -23,4 +21,4 @@ let safe_string spec =
 
 let id = function
   | Path path -> "U" ^ (safe_string (Path.to_string path))
-  | Https url -> "M" ^ (safe_string url)
+  | Https url -> "M" ^ (safe_string (Uri.to_string url))

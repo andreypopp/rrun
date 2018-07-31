@@ -63,6 +63,7 @@
     "@opam/ppx_sexp_conv": "*",
     "@opam/ppx_compare": "*",
     "@opam/fpath": "*",
+    "@opam/uri": "*",
     "@opam/ppxlib": "*",
     "@opam/fmt": "*",
     "@opam/merlin": "*",

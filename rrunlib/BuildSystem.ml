@@ -34,7 +34,7 @@ end = struct
   let label m =
     match m.src with
     | Path path -> Fpath.to_string path
-    | Https url -> url
+    | Https uri -> Uri.to_string uri
 
   let make ~cfg src =
     let id = Source.id src in
@@ -81,7 +81,7 @@ let fetch_to_store (m : Module.t) =
       Lwt.return ()
     | Ready -> Lwt.return ()
     end
-  | Source.Https url ->
+  | Source.Https uri ->
     if%lwt Fs.exists m.src_path
     then Lwt.return ()
     else (
@@ -91,7 +91,7 @@ let fetch_to_store (m : Module.t) =
         % "--silent"
         % "--fail"
         % "--location"
-        % url
+        % Uri.to_string uri
         % "--output" % p m.src_path
       )
     )
@@ -129,7 +129,16 @@ let extract_dependencies ~cfg (m : Module.t) =
           % "-impl" % p ppPath
         )
     in
-    Process.run ~env:[|"RRUN_FILENAME=" ^ Fpath.to_string path|] cmd;%lwt
+
+    let baseS =
+      m.src
+      |> Source.sexp_of_t
+      |> Sexplib.Sexp.to_string
+    in
+
+    Process.run
+      ~env:[|"RRUN_BASE=" ^ baseS|]
+      cmd;%lwt
     DepsMeta.of_file m.dep_path
 
 let build ~cfg (m : Module.t) =
@@ -157,7 +166,14 @@ let build ~cfg (m : Module.t) =
         in
         cmd
       in
-      Process.run ~env:[|"RRUN_FILENAME=" ^ Fpath.to_string (Module.orig_src_path m)|] cmd ;%lwt
+
+      let baseS =
+        m.src
+        |> Source.sexp_of_t
+        |> Sexplib.Sexp.to_string
+      in
+
+      Process.run ~env:[|"RRUN_BASE=" ^ baseS|] cmd ;%lwt
       Lwt.return true
     in
     match%lwt check_staleness ~out_path:m.obj_path (Module.orig_src_path m) with
@@ -226,14 +242,25 @@ let build ~cfg (m : Module.t) =
 
   buildExe ~force:needRebuild m.exe_path (List.rev objs) ;%lwt Lwt.return m
 
-let resolve spec base_path =
+let resolve ?base spec =
   let https_re = Str.regexp "^https:" in
   if Str.string_match https_re spec 0
-  then Source.Https spec
-  else Source.Path (Fpath.(base_path // v spec |> normalize))
+  then
+    Source.Https (Uri.of_string spec)
+  else
+    match base with
+    | Some (Source.Path base_path) ->
+      Source.Path (Fpath.(parent base_path // v spec |> normalize))
+    | Some (Source.Https uri) ->
+      let base_path = Fpath.v (Uri.path uri) in
+      let path = Fpath.(parent base_path // v spec |> normalize) in
+      let uri = Uri.with_path uri (Fpath.to_string path) in
+      Source.Https uri
+    | None ->
+      Source.Path (Fpath.(System.currentPath // v spec |> normalize))
 
 let build ~cfg root =
-  let root = resolve (Fpath.to_string root) System.currentPath in
+  let root = resolve (Fpath.to_string root) in
   let root = Module.make ~cfg root in
   let%lwt built = build ~cfg root in
   Lwt.return built.exe_path

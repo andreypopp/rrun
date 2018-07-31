@@ -19,13 +19,17 @@ let dependencies = ref []
 let expand ~loc ~path:_ (spec: string) =
   let ident =
     let src =
-      let fname =
-        try Fpath.v (Sys.getenv "RRUN_FILENAME") with Not_found ->
+      let base =
+        try
+          let data = Sys.getenv "RRUN_BASE" in
+          data
+          |> Sexplib.Sexp.of_string
+          |> Source.t_of_sexp
+        with Not_found ->
           let cwd = Sys.getcwd () in
-          Fpath.(v cwd // v loc.loc_start.pos_fname)
+          Source.Path Fpath.(v cwd // v loc.loc_start.pos_fname)
       in
-      let basePath = Fpath.(parent fname) in
-      BuildSystem.resolve spec basePath
+      BuildSystem.resolve ~base spec
     in
     let id = Source.id src in
     let ident = id |> Longident.parse |> Loc.make ~loc in

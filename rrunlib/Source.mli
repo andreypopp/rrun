@@ -1,6 +1,6 @@
 type t =
   | Path of Path.t
-  | Https of string
+  | Https of Uri.t
 
 val id : t -> string
 val sexp_of_t : t -> Ppx_sexp_conv_lib.Sexp.t
