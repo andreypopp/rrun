@@ -150,23 +150,25 @@ end = struct
         Deps.of_file m.depPath
 
   let build m =
-    let buildObj m =
-      match%lwt checkState ~out_path:m.objPath m.path with
-      | New | Stale ->
-          prerr_endline ("[b obj] " ^ Fpath.to_string m.path) ;
-          let cmd =
-            let ppx =
-              Cmd.(v "rrundep" % "-as-ppx" % "-loc-filename" % p m.path)
-            in
-            let open Cmd in
-            v "ocamlopt" % "-verbose" % "-c" % "-I" % p storePath % "-ppx"
-            % Cmd.to_string ppx % p m.srcPath
+    let buildObj ~force m =
+      let work () =
+        prerr_endline ("[b obj] " ^ Fpath.to_string m.path) ;
+        let cmd =
+          let ppx =
+            Cmd.(v "rrundep" % "-as-ppx" % "-loc-filename" % p m.path)
           in
-          Process.run ~env:[|"RRUN_FILENAME=" ^ Fpath.to_string m.path|] cmd ;%lwt
-          Lwt.return true
-      | Ready -> Lwt.return false
+          let open Cmd in
+          v "ocamlopt" % "-verbose" % "-c" % "-I" % p storePath % "-ppx"
+          % Cmd.to_string ppx % p m.srcPath
+        in
+        Process.run ~env:[|"RRUN_FILENAME=" ^ Fpath.to_string m.path|] cmd ;%lwt
+        Lwt.return true
+      in
+      match%lwt checkState ~out_path:m.objPath m.path with
+      | New | Stale -> work ()
+      | Ready -> if force then work () else Lwt.return false
     in
-    let buildExe ?(force= false) exePath objs =
+    let buildExe ~force exePath objs =
       let work () =
         prerr_endline ("[b exe] " ^ Fpath.to_string m.path) ;
         let cmd =
@@ -181,26 +183,34 @@ end = struct
       | Ready -> if force then work () else Lwt.return ()
     in
     let rec batchBuildObj (needRebuild, seen, objs) m =
+      (* prerr_endline ("[->] " ^ Fpath.to_string m.path) ; *)
       let%lwt deps = extractDependencies m in
-      let buildDep (needRebuild, seen, objs) (dep: Deps.dep) =
-        let%lwt m = ofPath dep.path in
-        batchBuildObj (needRebuild, seen, objs) m
-      in
       let%lwt needRebuild, seen, objs =
+        let buildDep (n, seen, objs) (dep: Deps.dep) =
+          let%lwt m = ofPath dep.path in
+          let%lwt nn, seen, objs = batchBuildObj (needRebuild, seen, objs) m in
+          Lwt.return (n || nn, seen, objs)
+        in
         Lwt_list.fold_left_s buildDep (needRebuild, seen, objs) deps
       in
+      let%lwt thisNeedRebuild = buildObj ~force:needRebuild m in
+      let thisWasRebuild =
+        match Fpath.Map.find_opt m.objPath seen with
+        | Some v -> v
+        | None -> false
+      in
       let%lwt needRebuild =
-        let%lwt thisNeedRebuild = buildObj m in
-        Lwt.return (needRebuild || thisNeedRebuild)
+        Lwt.return (needRebuild || thisNeedRebuild || thisWasRebuild)
       in
       let objs =
-        if Fpath.Set.mem m.objPath seen then objs else m.objPath :: objs
+        if Fpath.Map.mem m.objPath seen then objs else m.objPath :: objs
       in
-      let seen = Fpath.Set.add m.objPath seen in
+      let seen = Fpath.Map.add m.objPath thisNeedRebuild seen in
+      (* prerr_endline ("[<-] " ^ Fpath.to_string m.path) ; *)
       Lwt.return (needRebuild, seen, objs)
     in
     let%lwt needRebuild, _seen, objs =
-      batchBuildObj (false, Fpath.Set.empty, []) m
+      batchBuildObj (false, Fpath.Map.empty, []) m
     in
     buildExe ~force:needRebuild m.exePath (List.rev objs) ;%lwt Lwt.return m
 end
