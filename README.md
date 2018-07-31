@@ -1,7 +1,8 @@
 # rrun
 
-rrun stands for "Reason Run" and is an opinionated runtime for Reason (and
-OCaml).
+**WIP: DO NOT USE**
+
+rrun allows to seamlessly run [Reason][]/[OCaml][] code with native speed.
 
 ## Installation (not implemented yet)
 
@@ -13,14 +14,21 @@ Install rrun via npm:
 
 ## Usage
 
-Run Reason or OCaml programs with:
+### Running Code
+
+Run Reason/OCaml code with:
 
 ```shell
 % rrun ./app.re
 % rrun ./app.ml
 ```
 
-You can specify dependencies between modules via `[%import "..."]` syntax:
+rrun uses `ocamlopt` to compile sources and then caches compiled artifacts, on
+second invocation there will be no recompilation.
+
+### Dependencies
+
+You can specify dependencies between modules with `[%import "..."]` syntax:
 
 ```
 module Url = [%import "./Url.re"]
@@ -69,3 +77,6 @@ TODO
 - [x] Build OCaml code
 - [x] Support `[%import "./relative/path.ml"]` dependencies
 - [x] Support `[%import "https://secure/url.ml"]` dependencies
+
+[OCaml]: https://ocaml.org
+[Reason]: https://reasonml.github.io
