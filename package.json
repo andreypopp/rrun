@@ -48,7 +48,10 @@
         "opam__slash__yojson-*",
         "opam__slash__merlin_extend-*",
         "esy_ocaml__slash__esy_installer-*",
-        "opam__slash__menhir-*"
+        "opam__slash__menhir-*",
+        "opam__slash__stringext-*",
+        "opam__slash__re-*",
+        "opam__slash__uri-*"
       ]
     }
   },
