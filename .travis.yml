@@ -1,0 +1,16 @@
+language: node_js
+os:
+- linux
+- osx
+node_js:
+- '8'
+install:
+- npm install -g esy@0.2.4
+- esy install
+script:
+- esy build
+- esy release
+cache:
+  timeout: 360
+  directories:
+  - "$HOME/.esy/"
