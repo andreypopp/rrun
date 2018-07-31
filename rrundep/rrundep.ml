@@ -1,4 +1,5 @@
 open Ppxlib
+open Rrun
 
 let name = "import"
 
@@ -7,20 +8,7 @@ module Deps = struct
     let name = "deps"
   end
 
-  module V = struct
-    type t = (string * string * string) list
-
-    module S = Sexplib0.Sexp
-
-    let sexp_of_t items =
-      let f (id, spec, filename) =
-        S.List [S.Atom id; S.Atom spec; S.Atom filename]
-      in
-      let items = List.map f items in
-      S.List items
-
-    let t_of_sexp _ = []
-  end
+  module V = DepsMeta
 
   module NV = Driver.Create_file_property (N) (V)
   include NV
@@ -30,18 +18,18 @@ let dependencies = ref []
 
 let expand ~loc ~path:_ (spec: string) =
   let ident =
-    let filename =
+    let src =
       let fname =
         try Fpath.v (Sys.getenv "RRUN_FILENAME") with Not_found ->
           let cwd = Sys.getcwd () in
           Fpath.(v cwd // v loc.loc_start.pos_fname)
       in
       let basePath = Fpath.(parent fname) in
-      Fpath.to_string (Rrun.BuildSystem.resolve spec basePath)
+      BuildSystem.resolve spec basePath
     in
-    let id = Rrun.BuildSystem.make_id filename in
+    let id = Source.id src in
     let ident = id |> Longident.parse |> Loc.make ~loc in
-    dependencies := (id, spec, filename) :: !dependencies ;
+    dependencies := {DepsMeta. id; spec; src} :: !dependencies ;
     Deps.set !dependencies ;
     ident
   in

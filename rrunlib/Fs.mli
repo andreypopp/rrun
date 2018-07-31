@@ -1,3 +1,7 @@
+
+val exists : Fpath.t -> bool Lwt.t
+(** Check if file or dir exists. *)
+
 val stat : Fpath.t -> Unix.stats Lwt.t
 (** stat *)
 

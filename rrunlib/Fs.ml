@@ -2,6 +2,12 @@ let stat path =
   let path = Fpath.to_string path in
   Lwt_unix.stat path
 
+let exists path =
+  let path = Fpath.to_string path in
+  match%lwt Lwt_unix.stat path with
+  | exception Unix.Unix_error (Unix.ENOENT, _, _) -> Lwt.return false
+  | _ -> Lwt.return true
+
 let copy_stats ~stat path =
   let chown path uid gid =
     try%lwt Lwt_unix.chown path uid gid
