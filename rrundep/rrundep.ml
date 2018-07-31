@@ -32,10 +32,11 @@ let expand ~loc ~path:_ (spec: string) =
   let ident =
     let filename =
       let fname =
-        try Sys.getenv "RRUN_FILENAME" with Not_found ->
-          failwith "RRUN_FILENAME is not set"
+        try Fpath.v (Sys.getenv "RRUN_FILENAME") with Not_found ->
+          let cwd = Sys.getcwd () in
+          Fpath.(v cwd // v loc.loc_start.pos_fname)
       in
-      let basePath = Fpath.(parent (v fname)) in
+      let basePath = Fpath.(parent fname) in
       Fpath.to_string (Rrun.BuildSystem.resolve spec basePath)
     in
     let id = Rrun.BuildSystem.makeId filename in

@@ -130,7 +130,10 @@ end = struct
     match m.state with
     | Stale | New ->
         Fs.create_dir Fpath.(parent m.srcPath) ;%lwt
-        Fs.copy_file ~src_path:m.path m.srcPath ;%lwt
+        let before oc _ic =
+          Lwt_io.write oc ("# 1 \"" ^ Fpath.to_string m.path ^ "\"\n")
+        in
+        Fs.copy_file ~before ~src_path:m.path m.srcPath ;%lwt
         Lwt.return {m with state= Stale}
     | Ready -> Lwt.return m
 
@@ -158,8 +161,8 @@ end = struct
             Cmd.(v "rrundep" % "-as-ppx" % "-loc-filename" % p m.path)
           in
           let open Cmd in
-          v "ocamlopt" % "-verbose" % "-c" % "-I" % p storePath % "-ppx"
-          % Cmd.to_string ppx % p m.srcPath
+          v "ocamlopt" % "-verbose" % "-bin-annot" % "-c" % "-I" % p storePath
+          % "-ppx" % Cmd.to_string ppx % p m.srcPath
         in
         Process.run ~env:[|"RRUN_FILENAME=" ^ Fpath.to_string m.path|] cmd ;%lwt
         Lwt.return true

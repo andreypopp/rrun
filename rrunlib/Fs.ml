@@ -17,13 +17,16 @@ let read_file path =
   let path = Fpath.to_string path in
   Lwt_io.with_file ~mode:Lwt_io.Input path (fun ic -> Lwt_io.read ic)
 
-let copy_file ~src_path dst_path =
+let copy_file ?before ~src_path dst_path =
   let origPathS = Fpath.to_string src_path in
   let destPathS = Fpath.to_string dst_path in
   let chunkSize = 1024 * 1024 (* 1mb *) in
   let%lwt stat = Lwt_unix.stat origPathS in
   let copy ic oc =
     let buffer = Bytes.create chunkSize in
+    let%lwt () =
+      match before with Some before -> before oc ic | None -> Lwt.return ()
+    in
     let rec loop () =
       match%lwt Lwt_io.read_into ic buffer 0 chunkSize with
       | 0 -> Lwt.return ()
