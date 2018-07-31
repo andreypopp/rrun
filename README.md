@@ -27,7 +27,7 @@ module Url = [%import "./Url.re"]
 module Chalk = [%import "https://example.com/Chalk.re"]
 
 let url = Url.make("http://example.com");
-print_endline(Url.show(url));
+print_endline(Chalk.red(Url.show(url)));
 ```
 
 ### IDE support
@@ -62,10 +62,10 @@ TODO
 
 ### TODO
 
-- [ ] Build Reason code
 - [ ] Support `[%import "https://secure/url.ml"]` dependencies
 - [ ] Support interfaces
 - [ ] Sandboxed execution
 
+- [x] Build Reason code
 - [x] Build OCaml code
 - [x] Support `[%import "./relative/path.ml"]` dependencies
