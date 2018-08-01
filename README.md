@@ -1,10 +1,25 @@
 # rrun
 
-**WIP: DO NOT USE**
+**WIP: DO NOT USE, this piece of software isn't ready for general consumption,
+some things are not implemented, some things are not working properly.**
 
 [![Build Status](https://travis-ci.com/andreypopp/rrun.svg?branch=master)](https://travis-ci.com/andreypopp/rrun)
 
 rrun allows to seamlessly run [Reason][]/[OCaml][] code with native speed.
+
+## Motivation
+
+rrun aims to implement the following workflow for engineering software with
+Reason/OCaml language:
+
+- Start writing code by opening a plain `*.re` or `*.ml` file
+  - ... with autocomplete and real time error reporting available
+  - ... having a good set of standard libraries for interacting with a system
+  - ... reusing 3rd party code from a local file system or from the network
+- Code can be run with a single command invocation `rrun ./myapp.re`
+  - ... which builds the code and caches the result
+  - ... and sandboxes (configurable) execution by preventing it from
+    reading/writing to disk or accessing network
 
 ## Installation (not implemented yet)
 
@@ -70,7 +85,7 @@ TODO
 % esy "$EDITOR"
 ```
 
-### TODO
+### Roadmap
 
 - [ ] Sandboxed execution
 - [ ] Support interfaces
